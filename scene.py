@@ -1,9 +1,9 @@
-import Vecteur
-import Couleur
-import Sphere
-import Plan
-import Lumiere
-import Camera
+import vecteur
+import couleur
+import sphere
+import plan
+import lumiere
+import camera
 
 class Scene:
 
@@ -18,16 +18,16 @@ class Scene:
 	
 	def ajouter_sphere(self,pos,coul,diff,spec,ref,ombre,rayon):
 		'''ajoute une sphere a la scene'''
-		self.obj_list.append(Sphere(pos,coul,diff,spec,ref,ombre,rayon))
+		self.obj_list.append(sphere.Sphere(pos,coul,diff,spec,ref,ombre,rayon))
 		
 	
 	def ajouter_plan(self,pos,coul,diff,spec,ref,ombre,rayon):
 		'''ajoute un plan a la scene'''
-		self.obj_list.append(Plan(normale, pos, coul, diff, spec, ref, ombre))
+		self.obj_list.append(plan.Plan(normale, pos, coul, diff, spec, ref, ombre))
 	
 	def ajouter_lumiere(self, position, couleur):
 		'''ajoute une source lumineuse a la scene'''
-		self.lum_list.append(Lumiere(position, couleur))
+		self.lum_list.append(lumiere.Lumiere(position, couleur))
 	
 	def plus_proche_intersection(self,obj,point,rayon_vue):
 		'''calcule l'intersection entre une droite et un objet de la scene la plus proche de la camera'''

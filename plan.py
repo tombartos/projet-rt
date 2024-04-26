@@ -1,6 +1,6 @@
-import Objet3D
+import objet3D
 
-class Plan(Objet3D):
+class Plan(objet3D.Objet3D):
 	def __init__(self, normale, pos, coul, diff, spec, ref, ombre):
 		self.norm = normale
 		self.pos = pos

@@ -1,4 +1,4 @@
-import Vecteur
+import vecteur
 
 
 class Objet3D:
