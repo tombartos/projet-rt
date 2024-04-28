@@ -40,6 +40,6 @@ class Plan(objet3D.Objet3D):
 
 		return (xres,yres,zres)
 
-		def normale(self):
-			'''Renvoie la normale au plan'''
-			return self.norm	
+	def normale(self):
+		'''Renvoie la normale au plan'''
+		return self.norm	

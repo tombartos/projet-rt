@@ -1,6 +1,7 @@
-import Objet3D
+import objet3D
+import vecteur
 
-class Sphere(Objet3D):
+class Sphere(objet3D.Objet3D):
 		
 	def __init__(self,pos,coul,diff,spec,ref,ombre,rayon):
 		
@@ -53,4 +54,4 @@ class Sphere(Objet3D):
 		l,m,n = self.centre[0],self.centre[1],self.centre[2]
 		xi,yi,zi = point[0],point[1],point[2]
 		r = self.rayon
-		return Vecteur((0,0,0),(((xi-l)/r),((yi-m)/r),((zi-n)/r))).composantes()
+		return vecteur.Vecteur((0,0,0),(((xi-l)/r),((yi-m)/r),((zi-n)/r))).composantes()

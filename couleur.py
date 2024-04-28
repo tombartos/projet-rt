@@ -26,7 +26,7 @@ class Couleur:
 		
 		
 	def addition(self,coul):
-		'''addition entre 2 vecteurs''''
+		'''addition entre 2 vecteurs'''
 		
 		r,g,b = np.add((self.r,self.g,self.b),(coul.r,coul.g,coul.b)) % 256
 		res = Couleur(r,g,b)

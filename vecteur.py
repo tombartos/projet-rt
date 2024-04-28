@@ -7,8 +7,14 @@ class Vecteur:
 		self.org = np.array(origine, dtype = float)
 		self.extr = np.array(extremite, dtype = float)
 
+	def __str__(self):
+		return "Vecteur : origine = " + str(self.org) + ", extremite = " + str(self.extr) + ", composantes = " + str(self.composantes())
+	
 	def __add__(self, vec):
-		return self.addition(vec)
+		if type(vec) == type(Vecteur):
+			return self.addition(vec)
+		else:
+			return Vecteur(self.org, self.extr + vec)   #Addition par un scalaire
 
 	def __sub__(self, vec):
 		return self.soustraction(vec)
@@ -71,5 +77,4 @@ class Vecteur:
 
 class Point(Vecteur):
 	def __init__(self, coords):
-		self.org = coords
-		self.extr = coords
+		Vecteur.__init__(self, coords, coords)
