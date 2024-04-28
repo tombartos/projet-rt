@@ -10,7 +10,7 @@ class Camera:
 		self.dis = distance
 
 	def rayon(self, pplan):
-		'''Renvoie le rayon du point d'origine F vers un point pplan (x,y) du plan des dimensions de la camera'''
+		'''Renvoie le point (x, y z) et le rayon du point d'origine F vers un point pplan (x,y) du plan des dimensions de la camera'''
 		C = self.pos
 		F = vecteur.Point((self.pos.extr[0], self.pos.extr[1],self.pos.extr[2] + self.dis)) #TEMPORAIRE, Ne marche que si direction = (0,0,+-1), faire le calcul en entier
 																			 #Si on veut pouvoir faire pivoter la camera
@@ -28,7 +28,7 @@ class Camera:
 
 		res = vecteur.Vecteur(F.extr, Pxy.extr)
 
-		return res.normalisation()
+		return Pxy, res.normalisation()
 	
 if __name__ == "__main__":
 	cam = Camera(11, 11, (0,0,0), (0,0,-1), (0,1,0), 5)

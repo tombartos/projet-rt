@@ -35,7 +35,7 @@ class Sphere(objet3D.Objet3D):
 		delta = b**2 - 4*a*c
 		print("Delta=",delta)
 		if delta < 0:
-			return None					#pas de point d'intersection
+			return False					#pas de point d'intersection
 			
 		elif delta == 0:
 			t = -b/2*a
