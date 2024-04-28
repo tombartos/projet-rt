@@ -53,5 +53,5 @@ if __name__ == "__main__":
 	scene.modifier_camera(dim[0], dim[1], (0,0,0), (0,0,-1), (0,1,0), 5)
 	scene.ajouter_sphere((0, 9-(1/(2**0.5)), -4-(1/(2**0.5))), (0,255,0), None, None, None, False, 1)
 	scene.construrire_image()
-	1
+	
 	

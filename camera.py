@@ -22,7 +22,7 @@ class Camera:
 		P0 = C.addition(tmp).extr
 
 		if pplan == (0,0):
-			Pxy = P0
+			Pxy = vecteur.Point(P0)
 		else:
 			Pxy = vecteur.Point((P0[0] + pplan[0], P0[1] - pplan[1], 0))
 

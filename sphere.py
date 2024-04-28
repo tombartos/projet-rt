@@ -16,7 +16,8 @@ class Sphere(objet3D.Objet3D):
 		
 	
 	def intersection(self,point,rayon_vue):
-		'''implementation de intersection pour la sous-classe sphere. Le parametre "droite" est compose d'un point (tuple a 3 dimensions) et d'une instance de Vecteur'''
+		'''implementation de intersection pour la sous-classe sphere. Le parametre "droite" est compose d'un point (tuple a 3 dimensions) et d'une instance de Vecteur
+		Renvoie les coordonnees du point d'intersection si il existe, None sinon'''
 		#on part du point
 		D = rayon_vue
 		print("D=",D)
@@ -34,7 +35,7 @@ class Sphere(objet3D.Objet3D):
 		delta = b**2 - 4*a*c
 		print("Delta=",delta)
 		if delta < 0:
-			return "pas de point d'intersection"
+			return None					#pas de point d'intersection
 			
 		elif delta == 0:
 			t = -b/2*a
