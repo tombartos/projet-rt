@@ -92,7 +92,7 @@ class Scene:
 			lum = self.lum_list[0]						#On prend que la première lumière pour l'instant, il faudra faire le mélange de toutes les lumieres
 			ray_lum_list = []				#Liste des rayons de lumiere qui vont intercepter l'objet
 			for lum in self.lum_list:
-				ray_obj_lum = vecteur.Vecteur(inter.extr, lum.extr)
+				ray_obj_lum = vecteur.Vecteur(inter, lum.pos)
 				#TODO: Chercher les rayons de lumiere qui interceptent l'obj
 			
 			#R = self.ray_reflechi(L, N)
@@ -125,8 +125,8 @@ if __name__ == "__main__":
 	
 	cam=camera.Camera(320,240,(0,0,0),(1,0,0),(0,1,0),500) #Création de la Caméra 
 	list_obj=[sphere.Sphere((0,0,-200),(0,255,0),0,0,0, 0, 100), sphere.Sphere((150,0,-200),(255,0,0),0,0,0,0, 50)] #Création de la liste d'objets
-	lum=lumiere.Lumiere((-300,0,-50),0)   
-	scen=Scene(cam,list_obj,0) #Création de la Scène
+	lumlist=[lumiere.Lumiere((-300,0,-50),0)]   
+	scen=Scene(cam,list_obj, lumlist,0) #Création de la Scène
 	scen.construire_image() #appel fonction pour construire image
 	
 	# scene.modifier_camera(dim[0], dim[1], (0,0,0), (1,0,0), (0,1,0), 200)
