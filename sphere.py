@@ -54,7 +54,7 @@ class Sphere(objet3D.Objet3D):
 		l,m,n = self.centre[0],self.centre[1],self.centre[2]
 		xi,yi,zi = point[0],point[1],point[2]
 		r = self.rayon
-		return vecteur.Vecteur((0,0,0),(((xi-l)/r),((yi-m)/r),((zi-n)/r))).normalisation().composantes()
+		return vecteur.Vecteur((0,0,0),(((xi-l)/r),((yi-m)/r),((zi-n)/r))).normalisation()
 
 
 if __name__ == '__main__':
