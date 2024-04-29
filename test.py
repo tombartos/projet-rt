@@ -69,6 +69,8 @@ class Scene:
 		'''Modifie la camera de la scene'''
 		self.cam = camera.Camera(largeur, hauteur, position, direction, orientation, distance)
 	
+	def ray_reflechi(self, I, N):
+		return I.addition(2 * ((-1 * I).prod_scal(N)) * N)
 	
 	def phong(self,obj,Ii,L,N,rayon_vue=None,n=100,R=None):
 		'''applique le modèle d'illumination de Phong à l'objet'''
@@ -109,8 +111,9 @@ if __name__ == "__main__":
 	Ii = vecteur.Vecteur(extremite = (0.9,0.1,0.1))
 	L = vecteur.Vecteur(extremite = (0,-3/(34**0.5),5/(34**0.5)))
 	N = vecteur.Vecteur(extremite = (0,1/(2**0.5),1/(2**0.5)))
-	R = vecteur.Vecteur(extremite = (0,-5/(34**0.5),3/(34**0.5)))
-	print ((scene.phong(obj = obj,rayon_vue = rayon_vue,Ii = Ii,L = L, R = R, N = N).composantes()))
+	R = scene.ray_reflechi(L, N)
+	#print(R.composantes())
+	#print ((scene.phong(obj = obj,rayon_vue = rayon_vue,Ii = Ii,L = L, R = R, N = N).composantes()))
 	
 	
 

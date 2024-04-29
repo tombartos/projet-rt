@@ -18,13 +18,9 @@ class Camera:
 		h = self.dim[1]
 		H = vecteur.Vecteur(extremite = (0,1,0))
 		D = vecteur.Vecteur(extremite = (1,0,0))
-		tmp = H * (h/2 - 1/2) - D * (l/2 - 1/2)
-		P0 = C.addition(tmp).extr
-
-		if pplan == (0,0):
-			Pxy = vecteur.Point(P0)
-		else:
-			Pxy = vecteur.Point((P0[0] + pplan[0], P0[1] - pplan[1], 0))
+		P0 = C.addition(H * (h/2 - 0.5) - D * (l/2 - 0.5)).extr
+			
+		Pxy = vecteur.Point((P0[0] + pplan[0], P0[1] - pplan[1], 0))  #Attention au 0 quand on voudra faire des rotations de caméra
 
 		res = vecteur.Vecteur(F.extr, Pxy.extr)
 

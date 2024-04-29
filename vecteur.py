@@ -78,3 +78,9 @@ class Vecteur:
 class Point(Vecteur):
 	def __init__(self, coords):
 		Vecteur.__init__(self, coords, coords)
+
+
+if __name__ == "__main__":
+	vec = Vecteur((0,0,0), (2, 2, 2))
+	vec2 = -1*vec
+	print(vec2)
