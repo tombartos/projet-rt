@@ -9,8 +9,10 @@ from PIL import Image as im
 
 class Scene:
 
-	def __init__(self, cam = None,obj_list = [], lum_list = [], amb = None, img = None):
+	def __init__(self, Ia = None, ka = None,cam = None,obj_list = [], lum_list = [], amb = None, img = None):
 		
+		self.Ia = Ia
+		self.ka = ka
 		self.cam = cam
 		self.obj_list = obj_list
 		self.lum_list = lum_list
@@ -80,8 +82,8 @@ class Scene:
 		kd = obj.diff
 		ks = obj.spec
 		V = rayon_vue
-		print((Ia.mult_scal(ka)).composantes())
-		print((Ii.mult_scal(kd*L.prod_scal(N) + ks*((R.prod_scal(V))**100))).composantes())
+		#print((Ia.mult_scal(ka)).composantes())
+		#print((Ii.mult_scal(kd*L.prod_scal(N) + ks*((R.prod_scal(V))**100))).composantes())
 		return (Ia.mult_scal(ka)).addition(Ii.mult_scal(kd*L.prod_scal(N) + ks*((R.prod_scal(V))**100)))
 	
 	def lancer_rayon(self, point, rayon):
@@ -97,7 +99,7 @@ class Scene:
 			
 			#R = self.ray_reflechi(L, N)
 
-			#return self.obj_list[iobj].coul			
+			return self.phong(self.obj_list[iobj],vecteur.Vecteur(extremite = (0.9,0.1,0.1)),vecteur.Vecteur(extremite = (0,-3/(34**0.5),5/(34**0.5))),inter,rayon_vue = rayon,R=vecteur.Vecteur(extremite = (0,-5/(34**0.5),3/(34**0.5)))).composantes() * 255		
 		else:
 			return None
 
@@ -109,8 +111,9 @@ class Scene:
 			for j in range(self.cam.dim[1]):
 				point, ray = self.cam.rayon((i,j))				#Premiere etape : calcul des rayons de vue
 				px = self.lancer_rayon(point, ray)
-				if px:
-					mat_px[j][i] = px							#On doit inverser i et j dans la matrice de pixels a cause de PIL
+				if not(px is None):
+					
+					mat_px[j][i] = px						#On doit inverser i et j dans la matrice de pixels a cause de PIL
 		
 		data = im.fromarray(mat_px) #On prend la transposee car PIL et Numpy n'ont pas le meme systeme d'indicage
 		data.save('output.png') 
@@ -123,14 +126,14 @@ if __name__ == "__main__":
 	scene = Scene()
 	#dim = (600,400)			#Dimensions de l'image
 	
-	cam=camera.Camera(320,240,(0,0,0),(1,0,0),(0,1,0),500) #Création de la Caméra 
-	list_obj=[sphere.Sphere((0,0,-200),(0,255,0),0,0,0, 0, 100), sphere.Sphere((150,0,-200),(255,0,0),0,0,0,0, 50)] #Création de la liste d'objets
+	cam=camera.Camera(320,240,(0,0,0),(1,0,0),(0,1,0),-1000) #Création de la Caméra 
+	list_obj=[sphere.Sphere((-100,0,-200),(0,255,0),0,0,0, 0, 2000), sphere.Sphere((100,0,-200),(255,0,0),0,0,0,0,2000)] #Création de la liste d'objets
 	lumlist=[lumiere.Lumiere((-300,0,-50),0)]   
-	scen=Scene(cam,list_obj, lumlist,0) #Création de la Scène
+	scen=Scene(vecteur.Vecteur(extremite = (0.7,0.7,0.7)),0.2,cam,list_obj, lumlist,0) #Création de la Scène
 	scen.construire_image() #appel fonction pour construire image
 	
-	# scene.modifier_camera(dim[0], dim[1], (0,0,0), (1,0,0), (0,1,0), 200)
-	# scene.ajouter_sphere((200, 200, -100), (0,255,0), None, None, None, False, 70)
+	#scene.modifier_camera(dim[0], dim[1], (0,0,0), (1,0,0), (0,1,0), 200)
+	#scene.ajouter_sphere((200, 200, -100), (0,255,0), None, None, None, False, 70)
 	#scene.ajouter_sphere((0, 9-(1/(2**0.5)), -15-(1/(2**0.5))), (0,255,0), None, None, None, False, 1)
 	
 	#scene.construire_image()
