@@ -34,6 +34,8 @@ class Plan(objet3D.Objet3D):
 
 
 		t = -1 * ((A*x1 + B*y1 + C*z1 + D) / (A*i + B*j + C*k))
+		if t<0:
+			return False		#pas de point d'intersection, le plan est derriere le point d'origine du rayon
 
 		xres = x1 + v[0]*t
 		yres = y1 + v[1]*t

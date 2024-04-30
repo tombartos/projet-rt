@@ -163,9 +163,9 @@ if __name__ == "__main__":
 	#dim = (600,400)			#Dimensions de l'image
 
 	cam=camera.Camera(320,240,(0,0,0),(1,0,0),(0,1,0),700) #Création de la Caméra
-	list_obj=[sphere.Sphere((-100,0, 200), (0,1,0), 0.7, 0.1, 0, 0, 100), sphere.Sphere((100,0,-200), (1,0,0), 0.7, 0.1, 0, 0, 150)] #Création de la liste d'objets
-	#list_obj.append(plan.Plan((0,0,1), (0, 0, 50), (0, 0, 1), 0.7, 0.1, 0, 0))
-	lumlist=[lumiere.Lumiere((0,400,-50),(0.9, 0.1, 0.1))] #Lumière blanche
+	list_obj=[sphere.Sphere((-100,0, -200), (0,1,0), 0.7, 0.1, 0, 0, 100), sphere.Sphere((100,0,-200), (1,0,0), 0.7, 0.1, 0, 0, 150)] #Création de la liste d'objets
+	#list_obj.append(plan.Plan((0,0,1), (0, 0, 100), (0, 0, 1), 0.7, 0.1, 0, 0))
+	lumlist=[lumiere.Lumiere((0,400,-200),(0.9, 0.1, 0.1))] #Lumière blanche
 	scen=Scene(vecteur.Vecteur(extremite = (0.7,0.7,0.7)), 0.2, cam, list_obj, lumlist) #Création de la Scène
 	scen.construire_image() #appel fonction pour construire image
 
