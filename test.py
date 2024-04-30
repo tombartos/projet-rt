@@ -104,16 +104,22 @@ class Scene:
 
 
 if __name__ == "__main__":
-	scene = Scene(Ia = vecteur.Vecteur(extremite = (0.7,0.7,0.7)), ka = 0.2)
-	scene.ajouter_sphere((0, 9-(1/(2**0.5)), -4-(1/(2**0.5))), (0,255,0), 0.7, 0.1, None, False, 1)
-	obj = scene.obj_list[0]
-	rayon_vue = vecteur.Vecteur(extremite = (0,0,-1))
-	Ii = vecteur.Vecteur(extremite = (0.9,0.1,0.1))
-	L = vecteur.Vecteur(extremite = (0,-3/(34**0.5),5/(34**0.5)))
-	N = vecteur.Vecteur(extremite = (0,1/(2**0.5),1/(2**0.5)))
-	R = scene.ray_reflechi(L, N)
-	#print(R.composantes())
-	#print ((scene.phong(obj = obj,rayon_vue = rayon_vue,Ii = Ii,L = L, R = R, N = N).composantes()))
+	# scene = Scene(Ia = vecteur.Vecteur(extremite = (0.7,0.7,0.7)), ka = 0.2)
+	# scene.ajouter_sphere((0, 9-(1/(2**0.5)), -4-(1/(2**0.5))), (0,255,0), 0.7, 0.1, None, False, 1)
+	# obj = scene.obj_list[0]
+	# rayon_vue = vecteur.Vecteur(extremite = (0,0,-1))
+	# Ii = vecteur.Vecteur(extremite = (0.9,0.1,0.1))
+	# L = vecteur.Vecteur(extremite = (0,-3/(34**0.5),5/(34**0.5)))
+	# N = vecteur.Vecteur(extremite = (0,1/(2**0.5),1/(2**0.5)))
+	# R = scene.ray_reflechi(L, N)
+	# #print(R.composantes())
+	# #print ((scene.phong(obj = obj,rayon_vue = rayon_vue,Ii = Ii,L = L, R = R, N = N).composantes()))
 	
+	lum1 = lumiere.Lumiere((0,0,0), (1,1,1))
+	lum2 = lumiere.Lumiere((0,0,0), (2,2,2))
+	tab = [lum1, lum2]
+	print(tab[0].coul)
+	lum1.coul = (3,3,3)
+	print(tab[0].coul)	
 	
 

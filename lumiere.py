@@ -1,5 +1,5 @@
 class Lumiere:
 	'''Lumiere definie par une position et une couleur'''
-	def __init__(self, position, couleur):
+	def __init__(self, position, intens):
 		self.pos = position
-		self.coul = couleur
+		self.intens = intens

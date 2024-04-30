@@ -1,4 +1,5 @@
 import objet3D
+import vecteur
 
 class Plan(objet3D.Objet3D):
 	def __init__(self, normale, pos, coul, diff, spec, ref, ombre):
@@ -40,6 +41,6 @@ class Plan(objet3D.Objet3D):
 
 		return (xres,yres,zres)
 
-	def normale(self):
+	def normale(self, point):  #Je mets point ici pour eviter les problemes avec la methode normale pour les spheres
 		'''Renvoie la normale au plan'''
-		return self.norm	
+		return vecteur.Vecteur(extremite = self.norm)	

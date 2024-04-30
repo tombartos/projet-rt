@@ -28,4 +28,5 @@ class Camera:
 	
 if __name__ == "__main__":
 	cam = Camera(11, 11, (0,0,0), (0,0,-1), (0,1,0), 5)
-	print(cam.rayon((5,0)))
+	a = cam.rayon((5,0))
+	print(a[0].extr, a[1].composantes())
