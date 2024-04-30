@@ -88,7 +88,7 @@ class Scene:
 	
 	def lum_diffuse(self, inter, obj):
 			"""Renvoie les 3 cmposantes de la lumiere diffuse du point inter sur l'objet obj"""
-			ray_lum_list = []				#Liste des lumieres dont les rayons vont intercepter l'objet
+			ray_lum_list = []				#Liste des lumieres dont les rayons vont intersecter l'objet
 			#inter = np.round(inter)
 			#print(inter)
 			for lum in self.lum_list:
@@ -106,7 +106,7 @@ class Scene:
 			if len(ray_lum_list) > 0:	#Calcul de la lumiere diffuse
 				kd = obj.diff
 				N = obj.normale(inter)
-				sum = np.zeros(3, dtype = float)
+				somme = np.zeros(3, dtype = float)
 				coul_list = []
 				for lum in ray_lum_list:
 					coul_list.append(lum.intens)
@@ -114,10 +114,12 @@ class Scene:
 					coul_list = self.correction_gamma(coul_list)		
 
 				for i in range(len(ray_lum_list)):
-					Ii = np.array(coul_list[i])
-					L = vecteur.Vecteur(ray_lum_list[i].pos, inter).normalisation()
-					sum += Ii * (L.prod_scal(N))			#sum est un triplet
-				res = sum * kd
+    					Ii = np.array(coul_list[i])
+    					L = vecteur.Vecteur(ray_lum_list[i].pos, inter).normalisation()
+    					#print(L.composantes())
+    					dot_product = max(L.prod_scal(N),0)
+    					somme += Ii * kd * dot_product			#somme est un triplet
+				res = somme * kd
 				print(res)
 				return res
 			return np.zeros(3, dtype = float)		#On renvoie 0 0 0 si aucune lumiere n'atteint le point
