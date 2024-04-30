@@ -92,7 +92,7 @@ class Scene:
 			#inter = np.round(inter)
 			#print(inter)
 			for lum in self.lum_list:
-				ray_obj_lum = vecteur.Vecteur(inter, lum.pos)
+				ray_obj_lum = vecteur.Vecteur(inter, lum.pos).normalisation()
 
 				jobj, jinter = self.plus_proche_intersection(vecteur.Point(inter), ray_obj_lum) #On cherche si un objet se trouve sur le rayon de lumiere dans le sens objet -> lumiere
 				#print(jobj, jinter)
@@ -115,9 +115,10 @@ class Scene:
 
 				for i in range(len(ray_lum_list)):
 					Ii = np.array(coul_list[i])
-					L = vecteur.Vecteur(ray_lum_list[i].pos, inter)
+					L = vecteur.Vecteur(ray_lum_list[i].pos, inter).normalisation()
 					sum += Ii * (L.prod_scal(N))			#sum est un triplet
 				res = sum * kd
+				print(res)
 				return res
 			return np.zeros(3, dtype = float)		#On renvoie 0 0 0 si aucune lumiere n'atteint le point
 				
