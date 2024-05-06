@@ -77,7 +77,7 @@ class Scene:
 	
 	def correction_gamma(self, coul_list):
 		"""Renvoie la liste des couleurs contenues dans coul_list mais auquelles on a appliqué une correction gamma ENTRE 0 ET 1"""
-		print("gamma")
+		#print("gamma")
 		coul_list = np.array(coul_list)
 		n = len(coul_list)
 		max = np.max(coul_list)		#On cherche le max 
@@ -114,13 +114,13 @@ class Scene:
 					coul_list = self.correction_gamma(coul_list)		
 
 				for i in range(len(ray_lum_list)):
-    					Ii = np.array(coul_list[i])
-    					L = vecteur.Vecteur(ray_lum_list[i].pos, inter).normalisation()
-    					#print(L.composantes())
-    					dot_product = max(L.prod_scal(N),0)
-    					somme += Ii * kd * dot_product			#somme est un triplet
+						Ii = np.array(coul_list[i])
+						L = vecteur.Vecteur(inter, ray_lum_list[i].pos).normalisation()
+						#print(L.composantes())
+						dot_product = max(L.prod_scal(N),0)
+						somme += Ii * kd * dot_product			#somme est un triplet
 				res = somme * kd
-				print(res)
+				#print(res)
 				return res
 			return np.zeros(3, dtype = float)		#On renvoie 0 0 0 si aucune lumiere n'atteint le point
 				
@@ -165,10 +165,10 @@ class Scene:
 if __name__ == "__main__":
 	#dim = (600,400)			#Dimensions de l'image
 
-	cam=camera.Camera(320,240,(0,0,0),(1,0,0),(0,1,0),700) #Création de la Caméra
-	list_obj=[sphere.Sphere((-100,0, -200), (0,1,0), 0.7, 0.1, 0, 0, 100), sphere.Sphere((100,0,-200), (1,0,0), 0.7, 0.1, 0, 0, 150)] #Création de la liste d'objets
+	cam=camera.Camera(320,240,(0,0,0),(1,0,0),(0,1,0),500) #Création de la Caméra
+	list_obj=[sphere.Sphere((-100,0, -200), (0,1,0), 0.7, 0.1, 0, 0, 100), sphere.Sphere((100,0,-200), (1,0,0), 0.7, 0.1, 0, 0, 100)] #Création de la liste d'objets
 	#list_obj.append(plan.Plan((0,0,1), (0, 0, 100), (0, 0, 1), 0.7, 0.1, 0, 0))
-	lumlist=[lumiere.Lumiere((0,400,-200),(0.9, 0.1, 0.1))] #Lumière blanche
+	lumlist=[lumiere.Lumiere((0,0, -1),(0.9, 0.9, 0.9))] #Lumière blanche
 	scen=Scene(vecteur.Vecteur(extremite = (0.7,0.7,0.7)), 0.2, cam, list_obj, lumlist) #Création de la Scène
 	scen.construire_image() #appel fonction pour construire image
 

@@ -30,7 +30,7 @@ class Sphere(objet3D.Objet3D):
 		
 		a = D[0]**2 + D[1]**2 + D[2]**2
 		b = 2*v_eq[0]*D[0] + 2*v_eq[1]*D[1] + 2*v_eq[2]*D[2]
-		c = v_eq[0]**2 + v_eq[1]**2 + v_eq[2]**2 - self.rayon
+		c = v_eq[0]**2 + v_eq[1]**2 + v_eq[2]**2 - (self.rayon**2)
 		#print("a=",a,"b=",b,"c=",c)
 		delta = b**2 - 4*a*c
 		#print("Delta=",delta)
