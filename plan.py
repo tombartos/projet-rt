@@ -32,9 +32,11 @@ class Plan(objet3D.Objet3D):
 		y1 = point[1]
 		z1 = point[2]
 
-
-		t = -1 * ((A*x1 + B*y1 + C*z1 + D) / (A*i + B*j + C*k))
-		if t<0:
+		denom = (A*i + B*j + C*k)
+		if denom == 0:
+			return False
+		t = -1 * ((A*x1 + B*y1 + C*z1 + D) /denom )
+		if t<1:
 			return False		#pas de point d'intersection, le plan est derriere le point d'origine du rayon
 
 		xres = x1 + v[0]*t

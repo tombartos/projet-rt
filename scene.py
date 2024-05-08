@@ -48,9 +48,8 @@ class Scene:
 		while (imin == -1) and (i < n):					#On cherche le premier objet de la liste qui intersecte le rayon
 			intermin = self.obj_list[i].intersection(point.extr,rayon_vue.composantes())
 			if intermin:
-				distmin = self.dist_euclid(point.extr, intermin)
-				if distmin > 1:							#Securite pour les approximations des points, si a cause d'une approximation on a un point censé etre a la surface d'un objet
-					imin = i							#Mais qui se retrouve en fait a l'interieur de cet objet, et trouve donc une intersection avec ce meme objet
+				distmin = self.dist_euclid(point.extr, intermin)										#Securite pour les approximations des points, si a cause d'une approximation on a un point censé etre a la surface d'un objet
+				imin = i							#Mais qui se retrouve en fait a l'interieur de cet objet, et trouve donc une intersection avec ce meme objet
 														#On verifie que la distance soit superieur a un certain seuil, ici 1 pour considerer que c'est une vraie intersection
 			i+=1										#Et pas une erreur d'approximation
 
@@ -58,7 +57,7 @@ class Scene:
 			intertmp = self.obj_list[i].intersection(point.extr,rayon_vue.composantes())
 			if intertmp :
 				disttmp = self.dist_euclid(point.extr, intertmp)
-				if (disttmp > 1) and (disttmp < distmin):							#On garde que la plus proche intersection
+				if (disttmp < distmin):							#On garde que la plus proche intersection
 					imin = i
 					intermin = intertmp
 					distmin = disttmp
@@ -86,8 +85,8 @@ class Scene:
 		return res
 
 	
-	def lum_diffuse(self, inter, obj):
-			"""Renvoie les 3 cmposantes de la lumiere diffuse du point inter sur l'objet obj"""
+	def lum_diffuse(self, inter, obj, normale):
+			"""Renvoie les 3 cmposantes de la lumiere diffuse du point inter sur l'objet obj ainsi que la liste des rayons de lumiere qui touchent le point d'inter"""
 			ray_lum_list = []				#Liste des lumieres dont les rayons vont intersecter l'objet
 			#inter = np.round(inter)
 			#print(inter)
@@ -105,7 +104,6 @@ class Scene:
 						ray_lum_list.append(lum)
 			if len(ray_lum_list) > 0:	#Calcul de la lumiere diffuse
 				kd = obj.diff
-				N = obj.normale(inter)
 				somme = np.zeros(3, dtype = float)
 				coul_list = []
 				for lum in ray_lum_list:
@@ -117,19 +115,28 @@ class Scene:
 						Ii = np.array(coul_list[i])
 						L = vecteur.Vecteur(inter, ray_lum_list[i].pos).normalisation()
 						#print(L.composantes())
-						dot_product = max(L.prod_scal(N),0)
+						dot_product = max(L.prod_scal(normale),0)
 						somme += Ii * kd * dot_product			#somme est un triplet
 				res = somme * kd
 				#print(res)
 				return res
-			return np.zeros(3, dtype = float)		#On renvoie 0 0 0 si aucune lumiere n'atteint le point
+			return (np.zeros(3, dtype = float), ray_lum_list)		#On renvoie 0 0 0 si aucune lumiere n'atteint le point
 				
 
+	# def lum_spec(self, ray_vue, inter, obj, normale,ray_lum_list):
+	# 	"""Renvoie les 3 composantes de la lumiere speculaire au point inter pour le ray_vue sur obj avec la liste des rayons de lumiere qui touchent le point ray_lum_list"""
+	# 	coul_list = []
+	# 	normale = obj.normale(inter)
+	# 	for lum in ray_lum_list:
+	# 		lum_r = self.ray_reflechi(lum, normale)
 
 
-	def phong(self, obj, inter, rayon_vue = None, n=100):  		
+
+	def phong(self, obj, inter, rayon_vue, n=100):  		
 		'''Applique le modèle d'illumination de Phong à l'objet'''
-		diffus = vecteur.Vecteur(extremite = self.lum_diffuse(inter, obj))
+		normale = obj.normale(inter)
+		diffus, ray_lum_list = self.lum_diffuse(inter, obj, normale)
+		diffus = vecteur.Vecteur(extremite = diffus)
 		ambiant = self.Ia.mult_scal(self.ka)
 		spec = vecteur.Vecteur(extremite = (0, 0, 0)) #Speculaire a 0 pour l'instant donc rayon_vue et n ne servent pas pour l'instant
 		return (ambiant.addition(diffus).addition(spec)).composantes()	* obj.coul				#Idee pour spec : calculer les R de L directement dans self.lum_diff et les retourner
@@ -163,13 +170,21 @@ class Scene:
 
 
 if __name__ == "__main__":
-	#dim = (600,400)			#Dimensions de l'image
-
-	cam=camera.Camera(1280,720,(0,0,0),(1,0,0),(0,1,0),500) #Création de la Caméra
-	list_obj=[sphere.Sphere((0,0, -1200), (1,1,1), 0.7, 0.1, 0, 0, 1000), sphere.Sphere((-400,400,-400), (1,0,0), 0.7, 0.1, 0, 0, 150),sphere.Sphere((400,400, -400), (1,0,0), 0.7, 0.1, 0, 0, 150)] #Création de la liste d'objets
-	list_obj.append(plan.Plan((0,0,1), (0, 0, -3000), (0, 1, 1), 0.7, 0.1, 0, 0))
+	cam=camera.Camera(640,480,(0,0,0),(1,0,0),(0,1,0),300) #Création de la Caméra
+	list_obj=[sphere.Sphere((-300,0, -400), (1,0,0), 0.7, 0.1, 0, 0, 250), sphere.Sphere((300,0, -400), (0,0,1), 0.7, 0.1, 0, 0, 300)] #Création de la liste d'objets
+	list_obj.append(plan.Plan((0,0,1), (0, 0, -1000), (1, 1, 1), 0.7, 0.1, 0, 0))
 	lumlist=[lumiere.Lumiere((0,0, -1),(0.9, 0.9, 0.9))] #Lumière blanche
 	scen=Scene(vecteur.Vecteur(extremite = (0.7,0.7,0.7)), 0.2, cam, list_obj, lumlist) #Création de la Scène
 	scen.construire_image() #appel fonction pour construire image
+
+
+	#La scene de Nino
+
+	# cam=camera.Camera(1280,720,(0,0,0),(1,0,0),(0,1,0),500) #Création de la Caméra
+	# list_obj=[sphere.Sphere((0,0, -1200), (1,1,1), 0.7, 0.1, 0, 0, 1000), sphere.Sphere((-400,400,-400), (1,0,0), 0.7, 0.1, 0, 0, 150),sphere.Sphere((400,400, -400), (1,0,0), 0.7, 0.1, 0, 0, 150)] #Création de la liste d'objets
+	# list_obj.append(plan.Plan((0,0,1), (0, 0, -3000), (0, 1, 1), 0.7, 0.1, 0, 0))
+	# lumlist=[lumiere.Lumiere((0,0, -1),(0.9, 0.9, 0.9))] #Lumière blanche
+	# scen=Scene(vecteur.Vecteur(extremite = (0.7,0.7,0.7)), 0.2, cam, list_obj, lumlist) #Création de la Scène
+	# scen.construire_image() #appel fonction pour construire image
 
 	#scene.construire_image()

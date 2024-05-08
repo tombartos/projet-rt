@@ -39,18 +39,18 @@ class Sphere(objet3D.Objet3D):
 			
 		elif delta == 0:
 			t = -b/(a<<1)
-			if t<0:
+			if t<1:
 				return False
 			
 		
 		else:
 			t1 = (-b - delta**(0.5))/(2*a)
 			t2 = (-b + delta**(0.5))/(2*a)
-			if (t1 < 0) and (t2 < 0):
+			if (t1 < 1) and (t2 < 1):
 				return False
-			elif t1 < 0:
+			elif t1 < 1:
 				t = t2
-			elif t2 < 0:
+			elif t2 < 1:
 				t = t1
 			else: 
 				t = min(t1,t2)
