@@ -123,12 +123,12 @@ class Scene:
 			return (np.zeros(3, dtype = float), ray_lum_list)		#On renvoie 0 0 0 si aucune lumiere n'atteint le point
 				
 
-	# def lum_spec(self, ray_vue, inter, obj, normale,ray_lum_list):
-	# 	"""Renvoie les 3 composantes de la lumiere speculaire au point inter pour le ray_vue sur obj avec la liste des rayons de lumiere qui touchent le point ray_lum_list"""
-	# 	coul_list = []
-	# 	normale = obj.normale(inter)
-	# 	for lum in ray_lum_list:
-	# 		lum_r = self.ray_reflechi(lum, normale)
+	def lum_spec(self, ray_vue, inter, obj, normale,ray_lum_list):
+		"""Renvoie les 3 composantes de la lumiere speculaire au point inter pour le ray_vue sur obj avec la liste des rayons de lumiere qui touchent le point ray_lum_list"""
+		coul_list = []
+		for lum in ray_lum_list:
+			lum_r = self.ray_reflechi(lum, normale)
+			#TODO: Bouger toute la partie calcul de quel ray-lum on prends dans Phong pour récup facilement ray_lum_list et coul_obj_list (Ii)
 
 
 
