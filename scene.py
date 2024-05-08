@@ -84,59 +84,65 @@ class Scene:
 		res = res ** 2.2
 		return res
 
-	
-	def lum_diffuse(self, inter, obj, normale):
-			"""Renvoie les 3 cmposantes de la lumiere diffuse du point inter sur l'objet obj ainsi que la liste des rayons de lumiere qui touchent le point d'inter"""
-			ray_lum_list = []				#Liste des lumieres dont les rayons vont intersecter l'objet
-			#inter = np.round(inter)
-			#print(inter)
-			for lum in self.lum_list:
-				ray_obj_lum = vecteur.Vecteur(inter, lum.pos).normalisation()
+	def recherche_ray_lum(self, inter):
+		"""Renvoie la liste des rayons de lumiere qui touchent le point inter ainsi que la liste des couleurs de chacuns avec correction gamma"""
+		ray_lum_list = []				#Liste des lumieres dont les rayons vont intersecter l'objet
+		for lum in self.lum_list:
+			ray_obj_lum = vecteur.Vecteur(inter, lum.pos).normalisation()
 
-				jobj, jinter = self.plus_proche_intersection(vecteur.Point(inter), ray_obj_lum) #On cherche si un objet se trouve sur le rayon de lumiere dans le sens objet -> lumiere
-				#print(jobj, jinter)
-				if jobj == -1 :										#Pas d'objet entre notre point et notre lumiere, on est bon
+			jobj, jinter = self.plus_proche_intersection(vecteur.Point(inter), ray_obj_lum) #On cherche si un objet se trouve sur le rayon de lumiere dans le sens objet -> lumiere
+			#print(jobj, jinter)
+			if jobj == -1 :										#Pas d'objet entre notre point et notre lumiere, on est bon
+				ray_lum_list.append(lum)
+			else:											#Un objet est sur la demi droite, il faut verifier si il est avant ou apres la lumiere par rapport au point
+				a = self.dist_euclid(inter, lum.pos)
+				b = self.dist_euclid(inter, jinter)
+				if a < b : 			#Lumiere plus proche que l'autre objet, on est bon
 					ray_lum_list.append(lum)
-				else:											#Un objet est sur la demi droite, il faut verifier si il est avant ou apres la lumiere par rapport au point
-					a = self.dist_euclid(inter, lum.pos)
-					b = self.dist_euclid(inter, jinter)
-					if a < b : 			#Lumiere plus proche que l'autre objet, on est bon
-						ray_lum_list.append(lum)
-			if len(ray_lum_list) > 0:	#Calcul de la lumiere diffuse
-				kd = obj.diff
-				somme = np.zeros(3, dtype = float)
-				coul_list = []
-				for lum in ray_lum_list:
-					coul_list.append(lum.intens)
-				if len(coul_list) > 1:			#On applique la correction gamma si on a plusieurs lumieres
-					coul_list = self.correction_gamma(coul_list)		
+		
+		coul_list = []
+		if len(ray_lum_list) > 0:	
+			for lum in ray_lum_list:
+				coul_list.append(np.array(lum.intens))
+			if len(coul_list) > 1:			#On applique la correction gamma si on a plusieurs lumieres
+				coul_list = self.correction_gamma(coul_list)
+		return ray_lum_list, coul_list
+	
 
-				for i in range(len(ray_lum_list)):
-						Ii = np.array(coul_list[i])
-						L = vecteur.Vecteur(inter, ray_lum_list[i].pos).normalisation()
-						#print(L.composantes())
-						dot_product = max(L.prod_scal(normale),0)
-						somme += Ii * kd * dot_product			#somme est un triplet
-				res = somme * kd
-				#print(res)
-				return res
-			return (np.zeros(3, dtype = float), ray_lum_list)		#On renvoie 0 0 0 si aucune lumiere n'atteint le point
+	def lum_diffuse(self, inter, obj, ray_lum_list, coul_list, normale):
+			"""Renvoie les 3 cmposantes de la lumiere diffuse du point inter sur l'objet obj """
+			if len(ray_lum_list) == 0:
+				return (np.zeros(3, dtype = float))		#On renvoie 0 0 0 si aucune lumiere n'atteint le point
+			kd = obj.diff
+			somme = np.zeros(3, dtype = float)
+			for i in range(len(ray_lum_list)):			#Calcul de la lumiere diffuse
+					Ii = coul_list[i]
+					L = vecteur.Vecteur(inter, ray_lum_list[i].pos).normalisation()
+					#print(L.composantes())
+					dot_product = max(L.prod_scal(normale),0)
+					somme += Ii * dot_product			#somme est un triplet
+			res = somme * kd
+			#print(res)
+			return res
+			
 				
 
-	def lum_spec(self, ray_vue, inter, obj, normale,ray_lum_list):
+	def lum_spec(self, ray_vue, obj, normale, ray_lum_list, coul_list):
 		"""Renvoie les 3 composantes de la lumiere speculaire au point inter pour le ray_vue sur obj avec la liste des rayons de lumiere qui touchent le point ray_lum_list"""
-		coul_list = []
-		for lum in ray_lum_list:
-			lum_r = self.ray_reflechi(lum, normale)
-			#TODO: Bouger toute la partie calcul de quel ray-lum on prends dans Phong pour récup facilement ray_lum_list et coul_obj_list (Ii)
+		if len(ray_lum_list) == 0:
+			return (np.zeros(3, dtype = float))		#On renvoie 0 0 0 si aucune lumiere n'atteint le point
+		for i in range(len(ray_lum_list)):
+			lum_r = self.ray_reflechi(ray_lum_list[i], normale)
+			Ii = coul_list[i]
+
 
 
 
 	def phong(self, obj, inter, rayon_vue, n=100):  		
 		'''Applique le modèle d'illumination de Phong à l'objet'''
+		ray_lum_list, coul_list = self.recherche_ray_lum(inter)
 		normale = obj.normale(inter)
-		diffus, ray_lum_list = self.lum_diffuse(inter, obj, normale)
-		diffus = vecteur.Vecteur(extremite = diffus)
+		diffus = vecteur.Vecteur(extremite = self.lum_diffuse(inter, obj, ray_lum_list, coul_list, normale))
 		ambiant = self.Ia.mult_scal(self.ka)
 		spec = vecteur.Vecteur(extremite = (0, 0, 0)) #Speculaire a 0 pour l'instant donc rayon_vue et n ne servent pas pour l'instant
 		return (ambiant.addition(diffus).addition(spec)).composantes()	* obj.coul				#Idee pour spec : calculer les R de L directement dans self.lum_diff et les retourner
