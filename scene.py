@@ -72,69 +72,68 @@ class Scene:
 
 	def ray_reflechi(self, I, N):
 		"""Renvoie le rayon reflechi de I par rapport a la normale N"""
-		return I.addition(2 * ((-1 * I).prod_scal(N)) * N)
+		return (I.addition(2 * ((-1 * I).prod_scal(N)) * N)).normalisation()
 	
 	def correction_gamma(self, coul_list):
-		"""Renvoie la liste des couleurs contenues dans coul_list mais auquelles on a appliqué une correction gamma ENTRE 0 ET 1"""
+		"""NE FONCTIONNE PAS, Renvoie la liste des couleurs contenues dans coul_list mais auquelles on a appliqué une correction gamma ENTRE 0 ET 1"""
 		#print("gamma")
 		coul_list = np.array(coul_list)
-		n = len(coul_list)
 		max = np.max(coul_list)		#On cherche le max 
 		res = coul_list / max
-		res = res ** 2.2
+		res = res ** 2  #res ** 2.2
 		return res
 
 	def recherche_ray_lum(self, inter):
 		"""Renvoie la liste des rayons de lumiere qui touchent le point inter ainsi que la liste des couleurs de chacuns avec correction gamma"""
-		ray_lum_list = []				#Liste des lumieres dont les rayons vont intersecter l'objet
+		lum_list_inter = []				#Liste des lumieres dont les rayons vont intersecter l'objet
+		ray_lum_list = []
 		for lum in self.lum_list:
 			ray_obj_lum = vecteur.Vecteur(inter, lum.pos).normalisation()
 
 			jobj, jinter = self.plus_proche_intersection(vecteur.Point(inter), ray_obj_lum) #On cherche si un objet se trouve sur le rayon de lumiere dans le sens objet -> lumiere
 			#print(jobj, jinter)
 			if jobj == -1 :										#Pas d'objet entre notre point et notre lumiere, on est bon
-				ray_lum_list.append(lum)
+				lum_list_inter.append(lum)
+				ray_lum_list.append(ray_obj_lum)
 			else:											#Un objet est sur la demi droite, il faut verifier si il est avant ou apres la lumiere par rapport au point
 				a = self.dist_euclid(inter, lum.pos)
 				b = self.dist_euclid(inter, jinter)
 				if a < b : 			#Lumiere plus proche que l'autre objet, on est bon
-					ray_lum_list.append(lum)
+					lum_list_inter.append(lum)
+					ray_lum_list.append(ray_obj_lum)
 		
 		coul_list = []
-		if len(ray_lum_list) > 0:	
-			for lum in ray_lum_list:
+		if len(lum_list_inter) > 0:	
+			for lum in lum_list_inter:
 				coul_list.append(np.array(lum.intens))
-			if len(coul_list) > 1:			#On applique la correction gamma si on a plusieurs lumieres
-				coul_list = self.correction_gamma(coul_list)
+			# if len(coul_list) > 1:			#On applique la correction gamma si on a plusieurs lumieres
+			# 	coul_list = self.correction_gamma(coul_list)
 		return ray_lum_list, coul_list
 	
 
-	def lum_diffuse(self, inter, obj, ray_lum_list, coul_list, normale):
+	def lum_diffuse(self, obj, ray_lum_list, coul_list, normale):
 			"""Renvoie les 3 cmposantes de la lumiere diffuse du point inter sur l'objet obj """
 			if len(ray_lum_list) == 0:
 				return (np.zeros(3, dtype = float))		#On renvoie 0 0 0 si aucune lumiere n'atteint le point
-			kd = obj.diff
 			somme = np.zeros(3, dtype = float)
 			for i in range(len(ray_lum_list)):			#Calcul de la lumiere diffuse
-					Ii = coul_list[i]
-					L = vecteur.Vecteur(inter, ray_lum_list[i].pos).normalisation()
-					#print(L.composantes())
-					dot_product = max(L.prod_scal(normale),0)
-					somme += Ii * dot_product			#somme est un triplet
-			res = somme * kd
-			#print(res)
-			return res
+					L = ray_lum_list[i]
+					#print(L.composantes())		
+					somme += coul_list[i] * L.prod_scal(normale)	#somme est un triplet
+			return somme * obj.diff
 			
 				
 
-	def lum_spec(self, ray_vue, obj, normale, ray_lum_list, coul_list):
+	def lum_spec(self, ray_vue, obj, normale, ray_lum_list, coul_list, n):
 		"""Renvoie les 3 composantes de la lumiere speculaire au point inter pour le ray_vue sur obj avec la liste des rayons de lumiere qui touchent le point ray_lum_list"""
 		if len(ray_lum_list) == 0:
 			return (np.zeros(3, dtype = float))		#On renvoie 0 0 0 si aucune lumiere n'atteint le point
+		
+		somme = np.zeros(3, dtype = float)
 		for i in range(len(ray_lum_list)):
-			lum_r = self.ray_reflechi(ray_lum_list[i], normale)
-			Ii = coul_list[i]
-
+			lum_r = self.ray_reflechi(ray_lum_list[i] * -1, normale)
+			somme += (lum_r.prod_scal(ray_vue)**n) * coul_list[i]
+		return somme * obj.spec
 
 
 
@@ -142,10 +141,15 @@ class Scene:
 		'''Applique le modèle d'illumination de Phong à l'objet'''
 		ray_lum_list, coul_list = self.recherche_ray_lum(inter)
 		normale = obj.normale(inter)
-		diffus = vecteur.Vecteur(extremite = self.lum_diffuse(inter, obj, ray_lum_list, coul_list, normale))
+		diffus = vecteur.Vecteur(extremite = self.lum_diffuse(obj, ray_lum_list, coul_list, normale))
 		ambiant = self.Ia.mult_scal(self.ka)
-		spec = vecteur.Vecteur(extremite = (0, 0, 0)) #Speculaire a 0 pour l'instant donc rayon_vue et n ne servent pas pour l'instant
-		return (ambiant.addition(diffus).addition(spec)).composantes()	* obj.coul				#Idee pour spec : calculer les R de L directement dans self.lum_diff et les retourner
+		spec = vecteur.Vecteur(extremite = self.lum_spec(rayon_vue, obj, normale, ray_lum_list, coul_list, n)) #Speculaire a 0 pour l'instant donc rayon_vue et n ne servent pas pour l'instant
+		
+		res = ((ambiant.addition(diffus) * obj.coul).addition(spec)).composantes()
+		for i in range(3):	
+			if res[i] > 1:			#Corretion Gamma Moche
+				res[i] = 1
+		return res	
 
 	def lancer_rayon(self, point, rayon):
 		"""Algorithme de lancer de rayon, point est le point du plan de l'espace mathematique duquel part le rayon de vue rayon, mat_px est la matrice de pixels,
@@ -153,7 +157,7 @@ class Scene:
 		iobj, inter = self.plus_proche_intersection(point, rayon) # Deuxieme etape : calcul des intersections (indice de l'objet qui a la plus proche intersection avec la cam)
 		if iobj > -1 :
 			obj = self.obj_list[iobj]
-			return self.phong(obj, inter, rayon) * 255
+			return self.phong(obj, inter, rayon, 70) * 255
 		else:
 			return None
 
@@ -176,8 +180,9 @@ class Scene:
 
 
 if __name__ == "__main__":
+	test = vecteur.Vecteur(extremite = (0.7,0.7,0.7))
 	cam=camera.Camera(640,480,(0,0,0),(1,0,0),(0,1,0),300) #Création de la Caméra
-	list_obj=[sphere.Sphere((-300,0, -400), (1,0,0), 0.7, 0.1, 0, 0, 250), sphere.Sphere((300,0, -400), (0,0,1), 0.7, 0.1, 0, 0, 300)] #Création de la liste d'objets
+	list_obj=[sphere.Sphere((-300,0, -400), (1,0,0), 0.7, 0.7, 0, 0, 250), sphere.Sphere((300,0, -400), (0,0,1), 0.7, 0.9, 0, 0, 300)] #Création de la liste d'objets
 	list_obj.append(plan.Plan((0,0,1), (0, 0, -1000), (1, 1, 1), 0.7, 0.1, 0, 0))
 	lumlist=[lumiere.Lumiere((0,0, -1),(0.9, 0.9, 0.9))] #Lumière blanche
 	scen=Scene(vecteur.Vecteur(extremite = (0.7,0.7,0.7)), 0.2, cam, list_obj, lumlist) #Création de la Scène
