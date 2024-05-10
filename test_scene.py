@@ -3,7 +3,7 @@ import couleur
 import sphere
 import plan
 import lumiere
-import camera
+import test_camera
 import numpy as np
 from PIL import Image as im
 
@@ -18,6 +18,7 @@ grey = (0.5,0.5,0)
 orange = (1,0.64,0)
 pink = (1,0.75,0.8)
 brown = (0.59,0.29,0)
+#couleurs
 
 class Scene:
 
@@ -80,7 +81,7 @@ class Scene:
 
 	def modifier_camera(self, largeur, hauteur, position, direction, orientation, distance):
 		"""Modifie la camera de la scene"""
-		self.cam = camera.Camera(largeur, hauteur, position, direction, orientation, distance)
+		self.cam = test_camera.Camera(largeur, hauteur, position, direction, orientation, distance)
 
 	def ray_reflechi(self, I, N):
 		"""Renvoie le rayon reflechi de I par rapport a la normale N"""
@@ -149,7 +150,7 @@ class Scene:
 
 
 
-	def phong(self, obj, inter, rayon_vue, n=70):  		
+	def phong(self, obj, inter, rayon_vue, n=100):  		
 		'''Applique le modèle d'illumination de Phong à l'objet'''
 		ray_lum_list, coul_list = self.recherche_ray_lum(inter)
 		normale = obj.normale(inter)
@@ -163,74 +164,54 @@ class Scene:
 				res[i] = 1
 		return res	
 
-	def lancer_rayon(self, point, rayon, recur_level=0, first_iter_mode = False, mat_px = None):
-		"""Algorithme de lancer de rayon, point est le point du plan de l'espace mathematiques duquel part le rayon de vue rayon, 
+	def lancer_rayon(self, point, rayon):
+		"""Algorithme de lancer de rayon, point est le point du plan de l'espace mathematique duquel part le rayon de vue rayon, mat_px est la matrice de pixels,
 		Renvoie la couleur du pixel du point d'intersection si il existe"""
-		if first_iter_mode :
-			for i in range (self.cam.dim[0]):
-				for j in range(self.cam.dim[1]):
-					point, ray = self.cam.rayon((i,j))				#Premiere etape : calcul des rayons de vue
-					px = self.lancer_rayon(point, ray, 2)
-					if np.any(px) != None:
-						mat_px[j][i] = px*255				#On doit inverser i et j dans la matrice de pixels a cause de PIL
-			return mat_px
-		
-		else :
-			if  not isinstance(point, vecteur.Point):
-				point = vecteur.Point(point)
-			iobj, inter = self.plus_proche_intersection(point, rayon) # Deuxieme etape : calcul des intersections (indice de l'objet qui a la plus proche intersection avec la cam)
-			if iobj > -1 :
-				obj = self.obj_list[iobj]
-				if recur_level == 0:
-					return self.phong(obj, inter, rayon)
-				else : 
-					rayon2 = self.ray_reflechi(rayon, obj.normale(inter))
-					reflex_coul = self.lancer_rayon(inter, rayon2, recur_level -1)
-					if np.any(reflex_coul) != None:									#On vérifie si le rayon rélfléchi a trouve une intersection sinon on risque de se retrouver tout noir
-						res = reflex_coul * obj.ref + self.phong(obj, inter, rayon) * (1-obj.ref)
-						for i in range(3):			#Correction gamma moche
-							if res[i] > 1:
-								res[i] = 1
-						return res
-					else :
-						return self.phong(obj, inter, rayon)
-			else:
-				return None	#Pas d'intersetion
-		
-
+		iobj, inter = self.plus_proche_intersection(point, rayon) # Deuxieme etape : calcul des intersections (indice de l'objet qui a la plus proche intersection avec la cam)
+		if iobj > -1 :
+			obj = self.obj_list[iobj]
+			return self.phong(obj, inter, rayon, 70) * 255
+		else:
+			return None
 
 
 	def construire_image(self):
 		"""Algorithme principal qui construit l'image"""
-		self.cam.calcul_F()		#Pour si jamais on veut modifier la camera apres l'avoir init dans la scene
+		self.cam.calcul_F()         #calul de F
 		mat_px = np.full((self.cam.dim[1], self.cam.dim[0], 3), (0, 0, 0), dtype = np.uint8)  #On initialise la matrice de pixels à tout noir														#On doit inverser i et j dans la matrice de pixels a cause de PIL
-		mat_px = self.lancer_rayon(0, 0, -1, True, mat_px)
+		for i in range (self.cam.dim[0]):
+			for j in range(self.cam.dim[1]):
+				point, ray = self.cam.rayon((i,j))				#Premiere etape : calcul des rayons de vue
+				px = self.lancer_rayon(point, ray)
+				if np.any(px) != None:
+					mat_px[j][i] = px						#On doit inverser i et j dans la matrice de pixels a cause de PIL
 
 		data = im.fromarray(mat_px) #On prend la transposee car PIL et Numpy n'ont pas le meme systeme d'indicage
-		data.save('output.png')
+		data.save('test2.png')
 
 
 
 
 
 if __name__ == "__main__":
-	cam=camera.Camera(640,480,(0,0,0),(0,0,-1),(0,1,0),300) #Création de la Caméra
-	list_obj=[sphere.Sphere((-350,0, -400), (1,0,0), 0.7, 0.7, 0.3, 0, 175), sphere.Sphere((350,0, -400), (0,0,1), 0.7, 0.9, 0.3, 0, 175)] #Création de la liste d'objets
-	list_obj.append(sphere.Sphere((0,200, -600), (0,1,0), 0.7, 0.9, 0.3, 0, 200))
-	list_obj.append(plan.Plan((0,0,1), (0, 0, -1000), (1, 1, 1), 0.7, 0.1, 1, 0))
-	list_obj.append(plan.Plan((0,1,0), (0, -1000, 0), (1, 1, 0), 0.7, 0.1, 0.2, 0))
 
 
-	lumlist=[lumiere.Lumiere((-300,500, -200),(0.9, 0.9, 0.9))] #Lumière blanche
+	test = vecteur.Vecteur(extremite = (0.7,0.7,0.7))
+	cam=test_camera.Camera(640,480,(-300,0,0),(-0.64279,0,-0.76604),(0,1,0),300) #Création de la Caméra
+	list_obj=[sphere.Sphere((-300,0, -400), white, 0.7, 0.7, 0, 0, 250), sphere.Sphere((300,0, -400), brown, 0.7, 0.9, 0, 0, 300)] #Création de la liste d'objets
+	list_obj.append(plan.Plan((0,0,1), (0, 0, -1000), (1, 1, 1), 0.7, 0.1, 0, 0))
+	lumlist=[lumiere.Lumiere((0,0, -1),(0.9, 0.9, 0.9))] #Lumière blanche
 	scen=Scene(vecteur.Vecteur(extremite = (0.7,0.7,0.7)), 0.2, cam, list_obj, lumlist) #Création de la Scène
 	scen.construire_image() #appel fonction pour construire image
 
 
 	#La scene de Nino
-	# cam=camera.Camera(640,480,(0,0,0),(0,0,-1),(0,1,0),300) #Création de la Caméra
-	# list_obj=[sphere.Sphere((0,0, -1000), yellow, 0.7, 0.7, 0, 0, 500)]#, sphere.Sphere((0,0,-400), blue, 0.7, 0.9, 0, 0, 300)] #Création de la liste d'objets
-	# list_obj.append(plan.Plan((0,0,1), (0, 0, -1000), orange, 0.7, 0.1, 0, 0))
-	# list_obj.append(plan.Plan((0,1,0), (0, -1000, 0), green, 0.7, 0.1, 0, 0))
+
+	# cam=camera.Camera(1280,720,(0,0,0),(1,0,0),(0,1,0),500) #Création de la Caméra
+	# list_obj=[sphere.Sphere((0,0, -1200), (1,1,1), 0.7, 0.1, 0, 0, 1000), sphere.Sphere((-400,400,-400), (1,0,0), 0.7, 0.1, 0, 0, 150),sphere.Sphere((400,400, -400), (1,0,0), 0.7, 0.1, 0, 0, 150)] #Création de la liste d'objets
+	# list_obj.append(plan.Plan((0,0,1), (0, 0, -3000), (0, 1, 1), 0.7, 0.1, 0, 0))
 	# lumlist=[lumiere.Lumiere((0,0, -1),(0.9, 0.9, 0.9))] #Lumière blanche
 	# scen=Scene(vecteur.Vecteur(extremite = (0.7,0.7,0.7)), 0.2, cam, list_obj, lumlist) #Création de la Scène
 	# scen.construire_image() #appel fonction pour construire image
+
+	#scene.construire_image()

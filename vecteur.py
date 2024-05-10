@@ -79,6 +79,20 @@ class Point(Vecteur):
 	def __init__(self, coords):
 		Vecteur.__init__(self, coords, coords)
 
+	def addition(self, vec):
+		tmp = self.extr
+		tmp2 = vec.composantes()
+
+		tmp3 = np.add(tmp, tmp2)
+		return Point(tmp3)
+	
+	def soustraction(self, vec):
+		'''Renvoie le vecteur self - vec'''
+		tmp = self.extr
+		tmp2 = vec.composantes()
+		tmp3 = np.subtract(tmp, tmp2)
+		return Point(tmp3)
+	
 
 if __name__ == "__main__":
 	vec = Vecteur((0,0,0), (2, 2, 2))
