@@ -239,14 +239,15 @@ if __name__ == "__main__":
     # lumlist.append(lumiere.Lumiere((0, -300 , -100),(0.3, 0.3, 0.3)))
     # scen=Scene(vecteur.Vecteur(extremite = (0.7,0.7,0.7)), 0.2, cam, list_obj, lumlist) #Création de la Scène
 
-    #Scene 3
-    cam=camera.Camera(640,480,(0,0,0),(0,0,-1),(0,1,0),300) #Création de la Caméra
-    list_obj=[sphere.Sphere((-300,-300, -500), green, 0.7, 0.7, 0.7, 0, 150),sphere.Sphere((300,-300, -500), blue, 0.7, 0.7, 0.8, 0, 150),sphere.Sphere((-300,300, -500), red, 0.7, 0.7, 0.8, 0, 150),sphere.Sphere((300,300, -500), yellow, 0.7, 0.7, 0.8, 0, 150),sphere.Sphere((0,0, -500), black, 0.7, 0.7, 0.8, 0, 150)] #Création de la liste d'objets
-    #list_obj.append(sphere.Sphere((0,333, -300), white, 0.7, 0.7, 0, 0, 100))
-    list_obj.append(plan.Plan((0,0,1), (0, 0, -1000), white, 0.7, 0.1, 0, 0))
-    #list_obj.append(plan.Plan((0,1,0), (0, -1500, 0), white, 0.7, 0.1, 0.2, 0))
-    lumlist=[lumiere.Lumiere((0,0, -1),(0.9, 0.9, 0.9))] #Lumière blanche
-    scen=Scene(vecteur.Vecteur(extremite = (0.7,0.7,0.7)), 0.2, cam, list_obj, lumlist) #Création de la Scène
+    #Scene 4
+    cam=camera.Camera(640,480,(0,0,0),(0,0,-1),(0,1,0),300) 
+    list_obj=[sphere.Sphere((-300,-300, -1500), black, 0.7, 0.7, 0.3, 0, 150),sphere.Sphere((300,-300, -1500), black, 0.7, 0.7, 0.3, 0, 150),sphere.Sphere((-300,300, -1500), black, 0.7, 0.7, 0.3, 0, 150),sphere.Sphere((300,300, -1500), black, 0.7, 0.7, 0.3, 0, 150),sphere.Sphere((0,0, -1500), black, 0.7, 0.7, 0.3, 0, 150)]
+    list_obj.append(plan.Plan((0,0,1), (0, 0, -1500), blanc, 0.7, 0.1, 0.5, 0))
+    list_obj.append(plan.Plan((0,1,0), (0, -1000, 0), blanc, 0.7, 0.1, 0.2, 0))
+    list_obj.append(plan.Plan((1,0,0), (-1000, 0, 0), blanc, 0.7, 0.1, 0.5, 0))
+    list_obj.append(plan.Plan((-1,0,0), (1000, 0, 0), blanc, 0.7, 0.1, 0.5, 0))
+    lumlist=[lumiere.Lumiere((0,0, -1),(0.9, 0.9, 0.9))] 
+    scen=Scene(vecteur.Vecteur(extremite = (0.7,0.7,0.7)), 0.2, cam, list_obj, lumlist) 
 
 
     print("Generation de la scene ...")
