@@ -18,6 +18,7 @@ grey = (0.5,0.5,0)
 orange = (1,0.64,0)
 pink = (1,0.75,0.8)
 brown = (0.59,0.29,0)
+blanc = (1,1,1)
 
 class Scene:
 
@@ -214,23 +215,31 @@ class Scene:
 
 
 if __name__ == "__main__":
-	cam=camera.Camera(640,480,(0,0,0),(0,0,-1),(0,1,0),300) #Création de la Caméra
-	list_obj=[sphere.Sphere((-350,0, -400), (1,0,0), 0.7, 0.7, 0.3, 0, 175), sphere.Sphere((350,0, -400), (0,0,1), 0.7, 0.9, 0.3, 0, 175)] #Création de la liste d'objets
-	list_obj.append(sphere.Sphere((0,200, -600), (0,1,0), 0.7, 0.9, 0.3, 0, 200))
-	list_obj.append(plan.Plan((0,0,1), (0, 0, -1000), (1, 1, 1), 0.7, 0.1, 1, 0))
-	list_obj.append(plan.Plan((0,1,0), (0, -1000, 0), (1, 1, 0), 0.7, 0.1, 0.2, 0))
-
-
-	lumlist=[lumiere.Lumiere((-300,500, -200),(0.9, 0.9, 0.9))] #Lumière blanche
-	scen=Scene(vecteur.Vecteur(extremite = (0.7,0.7,0.7)), 0.2, cam, list_obj, lumlist) #Création de la Scène
-	scen.construire_image() #appel fonction pour construire image
-
-
-	#La scene de Nino
+	
+	# #Scene 1
 	# cam=camera.Camera(640,480,(0,0,0),(0,0,-1),(0,1,0),300) #Création de la Caméra
-	# list_obj=[sphere.Sphere((0,0, -1000), yellow, 0.7, 0.7, 0, 0, 500)]#, sphere.Sphere((0,0,-400), blue, 0.7, 0.9, 0, 0, 300)] #Création de la liste d'objets
-	# list_obj.append(plan.Plan((0,0,1), (0, 0, -1000), orange, 0.7, 0.1, 0, 0))
-	# list_obj.append(plan.Plan((0,1,0), (0, -1000, 0), green, 0.7, 0.1, 0, 0))
-	# lumlist=[lumiere.Lumiere((0,0, -1),(0.9, 0.9, 0.9))] #Lumière blanche
+	# list_obj=[sphere.Sphere((-350,0, -400), (1,0,0), 0.7, 0.7, 0.3, 0, 175), sphere.Sphere((350,0, -400), (0,0,1), 0.7, 0.9, 0.3, 0, 175)] #Création de la liste d'objets
+	# list_obj.append(sphere.Sphere((0,200, -600), (0,1,0), 0.7, 0.9, 0.3, 0, 200))
+	# list_obj.append(plan.Plan((0,0,1), (0, 0, -1000), (1, 1, 1), 0.7, 0.1, 1, 0))
+	# list_obj.append(plan.Plan((0,1,0), (0, -1000, 0), (1, 1, 0), 0.7, 0.1, 0.2, 0))
+	# lumlist=[lumiere.Lumiere((-300,500, -200),(0.9, 0.9, 0.9))] #Lumière blanche
 	# scen=Scene(vecteur.Vecteur(extremite = (0.7,0.7,0.7)), 0.2, cam, list_obj, lumlist) #Création de la Scène
-	# scen.construire_image() #appel fonction pour construire image
+	
+	
+	#Scene 2
+	cam=camera.Camera(640,480,(-300,0,0),(0.64,0,-0.77),(0,1,0),300) #Création de la Caméra
+	list_obj=[sphere.Sphere((0,0, -400), orange, 0.7, 0.7, 0.3, 0, 250)] #Création de la liste d'objets
+	list_obj.append(plan.Plan((0,0,1), (0, 0, -1000),blanc, 0.7, 0.1, 0.2, 0))
+	list_obj.append(plan.Plan((0,1,0), (0, -1000, 0), brown, 0.7, 0.1, 1, 0))
+	list_obj.append(plan.Plan((-1,0,0), (1000, 0, 0), pink, 0.7, 0.1, 0.2, 0))
+
+	lumlist=[lumiere.Lumiere((-300, 0, -100),(0.30, 0.3, 0.3))] #Lumière blanche
+	lumlist.append(lumiere.Lumiere((300, 0, -100),(0.3, 0.3, 0.3)))
+	lumlist.append(lumiere.Lumiere((0, 300 , -100),(0.3, 0.3, 0.3)))
+	lumlist.append(lumiere.Lumiere((0, -300 , -100),(0.3, 0.3, 0.3)))
+	scen=Scene(vecteur.Vecteur(extremite = (0.7,0.7,0.7)), 0.2, cam, list_obj, lumlist) #Création de la Scène
+
+	print("Generation de la scene ...")
+	scen.construire_image() #appel fonction pour construire image
+	print("Image Generee")
+
